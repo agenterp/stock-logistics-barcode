@@ -36,7 +36,6 @@ class BarcodeGenerateMixin(models.AbstractModel):
     @api.model
     def create(self, vals):
         """It creates a new barcode if automation is active."""
-        barcode_rule = None
         if not "barcode" in vals:
             barcode_rule = self.env['barcode.rule'].get_automatic_rule(self._name)
             if barcode_rule.exists():
@@ -44,7 +43,7 @@ class BarcodeGenerateMixin(models.AbstractModel):
                     'barcode_rule_id': barcode_rule.id,
                 })
         record = super(BarcodeGenerateMixin, self).create(vals)
-        if barcode_rule and not "barcode" in vals:
+        if not "barcode" in vals and barcode_rule:
             record.generate_base()
             record.generate_barcode()
         return record
